@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@layer components {
+  .text-neon {
+    text-shadow: 0 0 10px #fff, 0 0 20px #f0d58b, 0 0 40px #f0d58b;
+  }
+  
+  .font-signature {
+    font-family: 'Great Vibes', cursive; /* Import from Google Fonts */
+  }
+}
+
+/* Slow Cinematic Zoom Animation */
+@keyframes slowZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+
+.animate-slow-zoom {
+  animation: slowZoom 10s ease-out forwards;
+}
