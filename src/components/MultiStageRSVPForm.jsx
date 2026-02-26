@@ -20,7 +20,7 @@ const MultiStageRSVPForm = () => {
     setLoading(true);
     setError('');
     try {
-      await api.post('/submit', formData);
+      await api.post('/', formData);
       setStep(3);
     } catch (err) {
       setError(err.response?.data?.message || 'The guest list is currently full.');
