@@ -4,7 +4,7 @@ import axios from 'axios';
 import redCarpet from '../assets/redCrapet.jpg';
 
 const api = axios.create({
-  baseURL: 'https://rsvps-backend.onrender.com/api/rsvp',
+  baseURL: 'https://rsvps-backend.onrender.com/api/rsvp || http://localhost:5000/api/rsvp',
 });
 
 const MultiStageRSVPForm = () => {
@@ -19,24 +19,48 @@ const MultiStageRSVPForm = () => {
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
-    try {
-      await api.post('/', formData);
-      setStep(3);
-    } catch (err) {
-      setError(err.response?.data?.message || 'The guest list is currently full.');
-    } finally {
-      setLoading(false);
-    }
+
+    const options = {
+      key: "rzp_test_tG832kLaO0m5n2", // YOUR ACTUAL TEST KEY FROM DASHBOARD
+      amount: 13000, // ₹130 in paise
+      currency: "INR",
+      name: "The Soirée",
+      description: "Guest Registration Fee",
+      handler: async function (response) {
+        try {
+          // Send ALL data + Payment ID to your backend
+          await api.post('/', {
+            ...formData,
+            paymentId: response.razorpay_payment_id,
+            paymentStatus: 'success'
+          });
+          setStep(4); // Only move to success if backend confirms save
+        } catch (err) {
+          setError("Payment successful, but record saving failed. Contact support with ID: " + response.razorpay_payment_id);
+        } finally {
+          setLoading(false);
+        }
+      },
+      prefill: {
+        name: formData.name,
+        email: formData.email
+      },
+      theme: { color: "#f0d58b" },
+      modal: { ondismiss: () => setLoading(false) }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   // Animation variants for the "YouTube-style" font reveals
   const textVariant = {
     hidden: { opacity: 0, y: 20, letterSpacing: "0.5em" },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
+    visible: {
+      opacity: 1,
+      y: 0,
       letterSpacing: "0.2em",
-      transition: { duration: 1.2, ease: "easeOut" } 
+      transition: { duration: 1.2, ease: "easeOut" }
     }
   };
 
@@ -47,7 +71,7 @@ const MultiStageRSVPForm = () => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 text-white relative overflow-hidden">
       {/* Background with subtle parallax-like zoom */}
-      <motion.div 
+      <motion.div
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
         transition={{ duration: 10, repeat: Infinity, repeatType: "reverse" }}
@@ -57,7 +81,7 @@ const MultiStageRSVPForm = () => {
       <div className="absolute inset-0 bg-gradient-to-tr from-black via-black/80 to-transparent z-0" />
 
       <div className="relative z-10 w-full max-w-2xl bg-black/40 backdrop-blur-3xl p-8 md:p-16 border border-white/10 rounded-[2rem] shadow-2xl">
-        
+
         {error && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6 text-[#ff4d4d] text-[10px] tracking-widest uppercase text-center border border-[#ff4d4d]/30 p-2">
             {error}
@@ -73,11 +97,11 @@ const MultiStageRSVPForm = () => {
               <motion.p variants={textVariant} className="text-[#f0d58b] text-[10px] mb-12 uppercase tracking-[0.4em]">
                 Formal Invitation & Guest Registration
               </motion.p>
-              
+
               <div className="text-left space-y-4">
                 <label className={labelClasses}>Full Distinguished Name</label>
                 <input type="text" placeholder="Johnathan Doe" className={inputClasses} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                
+
                 <label className={labelClasses}>Electronic Mail</label>
                 <input type="email" placeholder="rsvp@soiree.com" className={inputClasses} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
               </div>
@@ -87,7 +111,7 @@ const MultiStageRSVPForm = () => {
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="space-y-10">
               <h2 className="text-center font-serif text-xl tracking-[0.2em] uppercase text-[#f0d58b] mb-12">Accommodations</h2>
-              
+
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <label className={labelClasses}>Dietary Preferences</label>
@@ -114,16 +138,74 @@ const MultiStageRSVPForm = () => {
             </motion.div>
           )}
 
+          {/* STEP 3: PAYMENT SUMMARY & GATEWAY */}
           {step === 3 && (
-            <motion.div key="step3" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-20">
-              <div className="text-[#f0d58b] text-6xl mb-8">◈</div>
-              <h2 className="text-3xl font-serif tracking-[0.3em] uppercase mb-4">Confirmed</h2>
-              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-12">We await your arrival in black-tie attire.</p>
-              <button 
-                onClick={() => { setStep(1); setFormData({name:'', email:'', tableCompanion:'', dietary:'', liquor:'', children:'', brunch:'', tshirtSize:''}); }} 
-                className="text-[#f0d58b] border border-[#f0d58b]/20 px-8 py-3 rounded-full hover:bg-[#f0d58b] hover:text-black transition-all text-[9px] tracking-widest uppercase"
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              className="text-center"
+            >
+              <h2 className="font-serif text-xl tracking-[0.2em] uppercase text-[#f0d58b] mb-8">Reservation Summary</h2>
+
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left space-y-4 backdrop-blur-md">
+                <div className="flex justify-between text-[10px] tracking-widest uppercase border-b border-white/5 pb-2">
+                  <span className="text-white/40">Distinguished Guest</span>
+                  <span>{formData.name}</span>
+                </div>
+                <div className="flex justify-between text-[10px] tracking-widest uppercase border-b border-white/5 pb-2">
+                  <span className="text-white/40">Event Access</span>
+                  <span>Soirée & Brunch</span>
+                </div>
+                <div className="flex justify-between text-xl font-serif pt-4">
+                  <span className="text-[#f0d58b]">Contribution</span>
+                  <span>₹130.00</span>
+                </div>
+              </div>
+
+              <button
+                onClick={handleSubmit} // This will trigger the Razorpay popup
+                disabled={loading}
+                className="w-full bg-[#f0d58b] text-black py-5 rounded-full font-bold uppercase text-[11px] tracking-[0.3em] hover:shadow-[0_0_30px_rgba(240,213,139,0.4)] transition-all disabled:opacity-50 mb-6"
               >
-                Register Another
+                {loading ? 'Securing Spot...' : 'Proceed to Payment'}
+              </button>
+
+              <button onClick={() => setStep(2)} className="text-white/40 uppercase text-[9px] tracking-widest hover:text-white transition-all">
+                ← Review Details
+              </button>
+            </motion.div>
+          )}
+
+          {/* STEP 4: FINAL CONFIRMATION */}
+          {step === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="text-center py-10 md:py-20"
+            >
+              <motion.div
+                initial={{ rotate: -180, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="text-[#f0d58b] text-6xl mb-8"
+              >
+                ◈
+              </motion.div>
+              <h2 className="text-3xl font-serif tracking-[0.3em] uppercase mb-4">Confirmed</h2>
+              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2">Your reservation is now secured.</p>
+              <p className="text-[#f0d58b] text-[10px] uppercase tracking-[0.2em] mb-12 italic font-light">Payment Received Successfully</p>
+
+              <button
+                onClick={() => {
+                  setStep(1);
+                  setFormData({ name: '', email: '', tableCompanion: '', dietary: '', liquor: '', children: '', brunch: '', tshirtSize: '' });
+                }}
+                className="text-[#f0d58b] border border-[#f0d58b]/20 px-10 py-4 rounded-full hover:bg-[#f0d58b] hover:text-black transition-all text-[9px] tracking-[0.3em] uppercase"
+              >
+                Register Another Guest
               </button>
             </motion.div>
           )}
@@ -138,7 +220,7 @@ const MultiStageRSVPForm = () => {
             >
               {loading ? 'Submitting...' : step === 1 ? 'Proceed to Details' : 'Finalize Reservation'}
             </button>
-            
+
             {step > 1 && (
               <button onClick={() => setStep(1)} className="text-white/40 uppercase text-[9px] tracking-widest hover:text-white transition-all">
                 ← Modify Previous Details

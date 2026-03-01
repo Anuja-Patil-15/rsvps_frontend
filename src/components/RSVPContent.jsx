@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const RSVPContent = () => {
   const navigate = useNavigate();
+  
 
   // Standard Luxury Colors derived from the provided images
   const goldPrimary = "#f0d58b"; // From RSVP text in image_7dc39c.jpg
@@ -25,51 +26,70 @@ const RSVPContent = () => {
         </h1>
 
         {/* Layout Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 pt-4 text-center md:text-left">
-          
-          {/* DAY 1 */}
-          <div className="space-y-4 md:border-r md:border-white/10 px-2 md:px-6">
-            <h5 className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-widest text-sm uppercase italic`}>
-              Day 1 | Labor Day Wknd
-            </h5>
-            <div className="space-y-3">
-              <p className="text-sm md:text-base font-semibold uppercase tracking-tight leading-snug">
-                Sat, Sept 5 | 6PM-12AM | 
-                <a 
-                  href="https://www.grandoccasionslaurel.com/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={`text-[${goldPrimary}] hover:text-white underline ml-1 transition-colors inline-block decoration-1 underline-offset-4`}
-                >
-                  Grand Occasions, Laurel
-                </a>
-              </p>
-              <p className="text-[12px] md:text-xs text-white/80 leading-relaxed font-light">
-                Attire - Gentlemen: Strictly Black Suit & Bow-tie, Ladies: Elegant Dress | $130 Single / $250 Couples 
-                <br className="hidden md:block" />
-                <span className="mt-2 block md:inline italic md:not-italic text-white/60">
-                  (Includes: Red Carpet Event, Complimentary Childcare, Open Bar and more)
-                </span>
-              </p>
-            </div>
-          </div>
 
-          {/* DAY 2 */}
-          <div className="space-y-4 px-2 md:px-6">
-            <h5 className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-widest text-sm uppercase italic`}>
-              Day 2 | Sunday Brunch
-            </h5>
-            <div className="space-y-3">
-              <p className="text-sm md:text-base font-semibold uppercase tracking-tight leading-snug">
-                Sun, Sept 6 | 12PM-5PM | <span className={`text-[${goldPrimary}] block md:inline`}>Location: TBC (Maryland)</span>
-              </p>
-              <p className="text-[12px] md:text-xs text-white/80 leading-relaxed font-light">
-                Casual Vibes (TCGFI T-Shirt) | Complimentary for All Guests | A relaxed brunch to connect, 
-                unwind, and continue the Labor Day celebration.
-              </p>
-            </div>
-          </div>
-        </div>
+<motion.div 
+  initial={{ opacity: 0 }}
+  whileInView={{ opacity: 1 }}
+  transition={{ duration: 0.8 }}
+  viewport={{ once: true }}
+  className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 pt-4 text-center md:text-left"
+>
+  
+  {/* DAY 1 - Slides in from left */}
+  <motion.div 
+    initial={{ opacity: 0, x: -20 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.6, delay: 0.2 }}
+    viewport={{ once: true }}
+    className="space-y-4 md:border-r md:border-white/10 px-2 md:px-6"
+  >
+    <h5 className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-widest text-sm uppercase italic`}>
+      Day 1 | Labor Day Wknd
+    </h5>
+    <div className="space-y-3">
+      <p className="text-sm md:text-base font-semibold uppercase tracking-tight leading-snug">
+        Sat, Sept 5 | 6PM-12AM | 
+        <a 
+          href="https://www.grandoccasionslaurel.com/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className={`text-[${goldPrimary}] hover:text-white underline ml-1 transition-colors inline-block decoration-1 underline-offset-4`}
+        >
+          Grand Occasions, Laurel
+        </a>
+      </p>
+      <p className="text-[12px] md:text-xs text-white/80 leading-relaxed font-light">
+        Attire - Gentlemen: Strictly Black Suit & Bow-tie, Ladies: Elegant Dress | $130 Single / $250 Couples 
+        <br className="hidden md:block" />
+        <span className="mt-2 block md:inline italic md:not-italic text-white/60">
+          (Includes: Red Carpet Event, Complimentary Childcare, Open Bar and more)
+        </span>
+      </p>
+    </div>
+  </motion.div>
+
+  {/* DAY 2 - Slides in from right */}
+  <motion.div 
+    initial={{ opacity: 0, x: 20 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.6, delay: 0.4 }}
+    viewport={{ once: true }}
+    className="space-y-4 px-2 md:px-6"
+  >
+    <h5 className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-widest text-sm uppercase italic`}>
+      Day 2 | Sunday Brunch
+    </h5>
+    <div className="space-y-3">
+      <p className="text-sm md:text-base font-semibold uppercase tracking-tight leading-snug">
+        Sun, Sept 6 | 12PM-5PM | <span className={`text-[${goldPrimary}] block md:inline`}>Location: TBC (Maryland)</span>
+      </p>
+      <p className="text-[12px] md:text-xs text-white/80 leading-relaxed font-light">
+        Casual Vibes (TCGFI T-Shirt) | Complimentary for All Guests | A relaxed brunch to connect, 
+        unwind, and continue the Labor Day celebration.
+      </p>
+    </div>
+  </motion.div>
+</motion.div>
 
         {/* Standard Action Button - Replaced Blue with Decent Crimson/Gold */}
         <div className="pt-6">
