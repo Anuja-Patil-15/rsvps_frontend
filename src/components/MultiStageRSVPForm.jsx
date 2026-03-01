@@ -120,10 +120,10 @@ const MultiStageRSVPForm = () => {
 
               <div className="text-left space-y-4">
                 <label className={labelClasses}>Full Distinguished Name</label>
-                <input type="text" placeholder="Johnathan Doe" className={inputClasses} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                <input type="text" placeholder="Enter Name" className={inputClasses} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
 
                 <label className={labelClasses}>Electronic Mail</label>
-                <input type="email" placeholder="rsvp@soiree.com" className={inputClasses} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                <input type="email" placeholder="Enter Email" className={inputClasses} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
               </div>
             </motion.div>
           )}
@@ -153,7 +153,7 @@ const MultiStageRSVPForm = () => {
 
               <div>
                 <label className={labelClasses}>Preferred Libations (Wine/Liquor)</label>
-                <input type="text" placeholder="e.g. Cabernet, Grey Goose" className={inputClasses} value={formData.liquor} onChange={(e) => setFormData({ ...formData, liquor: e.target.value })} />
+                <input type="text" placeholder="" className={inputClasses} value={formData.liquor} onChange={(e) => setFormData({ ...formData, liquor: e.target.value })} />
               </div>
             </motion.div>
           )}
