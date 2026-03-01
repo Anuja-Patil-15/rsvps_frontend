@@ -53,7 +53,7 @@ const RSVPContent = () => {
   );
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center justify-center p-4 md:p-8 text-white relative font-sans overflow-hidden">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center p-1 md:p-8 text-white relative font-sans overflow-hidden">
 
       <motion.div
         variants={containerVariants}
@@ -78,7 +78,7 @@ const RSVPContent = () => {
         <CharacterReveal
           text="RSVP"
           staggerDelay={0.15}
-          className={`text-[${goldPrimary}] text-7xl sm:text-8xl md:text-[11rem] font-black tracking-widest drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]`}
+          className={`text-[${goldPrimary}] text-5xl sm:text-6xl md:text-[9rem] font-black tracking-widest drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]`}
         />
 
         {/* STEP 3: Day 1 & Day 2 Sections (Sliding in from center) */}
