@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import redCarpet from '../assets/redCrapet.jpg'; // Verify this spelling in your folder!
+import redCarpet from '../../public/redCarpet.jpg'; // Verify this spelling in your folder!
 
 // Corrected API Base URL logic
 const api = axios.create({

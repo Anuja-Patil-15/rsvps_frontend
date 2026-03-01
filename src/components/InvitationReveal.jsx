@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MultiStageRSVPForm from './MultiStageRSVPForm'; // Ensure path is correct
-import redCarpetImage from '../assets/redCrapet.jpg'; 
+import redCarpetImage from '../../public/redCarpet.jpg'; // Ensure you have a red carpet image in your public folder
 import RSVPContent from './RSVPContent';
 
 const GrandInvitation = () => {
