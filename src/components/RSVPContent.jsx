@@ -4,106 +4,148 @@ import { useNavigate } from 'react-router-dom';
 
 const RSVPContent = () => {
   const navigate = useNavigate();
-  
+  const goldPrimary = "#f0d58b";
+  const deepRed = "#7c0000";
 
-  // Standard Luxury Colors derived from the provided images
-  const goldPrimary = "#f0d58b"; // From RSVP text in image_7dc39c.jpg
-  const deepRed = "#7c0000";    // From the red carpet in image_7e3bb6.jpg
+  // 1. Parent Sequence Orchestration
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.8, // Timing between major sections
+      },
+    },
+  };
+
+  // 2. Character Reveal Variants for that cinematic "Birthday Brunch" look
+  const charVariants = {
+    hidden: { opacity: 0, scale: 0.5, filter: "blur(10px)", y: 10 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      filter: "blur(0px)",
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    }
+  };
+
+  // 3. Block Text Variants (Keeps your full text content intact)
+  const blockFade = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeOut" } }
+  };
+
+  // Helper for Character-by-Character animation
+  const CharacterReveal = ({ text, className, staggerDelay = 0.05 }) => (
+    <motion.div className={className}>
+      {text.split("").map((char, index) => (
+        <motion.span
+          key={index}
+          variants={charVariants}
+          transition={{ delay: index * staggerDelay }}
+          style={{ display: "inline-block", whiteSpace: "pre" }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </motion.div>
+  );
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-4 md:p-8 text-white relative font-sans">
-      
-      <div className="relative z-10 text-center max-w-6xl w-full space-y-6 md:space-y-10">
-        
-        {/* Header Intro - Classic Gold on Dark */}
-        <h4 className={`text-[${goldPrimary}] text-[10px] md:text-sm font-bold tracking-[0.2em] uppercase leading-loose md:leading-relaxed max-w-2xl mx-auto opacity-90`}>
-          Twin City Global Friends Initiative Presents: <br className="md:hidden" /> Family & Friends Soirée & Brunch
-        </h4>
-        
-        {/* Main RSVP Title - Standardized Gold */}
-        <h1 className={`text-[${goldPrimary}] text-6xl sm:text-7xl md:text-9xl font-black tracking-tighter drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]`}>
-          RSVP
-        </h1>
+    <div className="w-full min-h-screen flex flex-col items-center justify-center p-4 md:p-8 text-white relative font-sans overflow-hidden">
 
-        {/* Layout Grid */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 text-center max-w-6xl w-full space-y-10 md:space-y-16"
+      >
 
-<motion.div 
-  initial={{ opacity: 0 }}
-  whileInView={{ opacity: 1 }}
-  transition={{ duration: 0.8 }}
-  viewport={{ once: true }}
-  className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 pt-4 text-center md:text-left"
+        {/* STEP 1: First Line Character Reveal */}
+       <motion.div 
+  variants={blockFade} 
+  className="max-w-3xl mx-auto"
 >
-  
-  {/* DAY 1 - Slides in from left */}
-  <motion.div 
-    initial={{ opacity: 0, x: -20 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.6, delay: 0.2 }}
-    viewport={{ once: true }}
-    className="space-y-4 md:border-r md:border-white/10 px-2 md:px-6"
-  >
-    <h5 className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-widest text-sm uppercase italic`}>
-      Day 1 | Labor Day Wknd
-    </h5>
-    <div className="space-y-3">
-      <p className="text-sm md:text-base font-semibold uppercase tracking-tight leading-snug">
-        Sat, Sept 5 | 6PM-12AM | 
-        <a 
-          href="https://www.grandoccasionslaurel.com/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className={`text-[${goldPrimary}] hover:text-white underline ml-1 transition-colors inline-block decoration-1 underline-offset-4`}
-        >
-          Grand Occasions, Laurel
-        </a>
-      </p>
-      <p className="text-[12px] md:text-xs text-white/80 leading-relaxed font-light">
-        Attire - Gentlemen: Strictly Black Suit & Bow-tie, Ladies: Elegant Dress | $130 Single / $250 Couples 
-        <br className="hidden md:block" />
-        <span className="mt-2 block md:inline italic md:not-italic text-white/60">
-          (Includes: Red Carpet Event, Complimentary Childcare, Open Bar and more)
-        </span>
-      </p>
-    </div>
-  </motion.div>
-
-  {/* DAY 2 - Slides in from right */}
-  <motion.div 
-    initial={{ opacity: 0, x: 20 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.6, delay: 0.4 }}
-    viewport={{ once: true }}
-    className="space-y-4 px-2 md:px-6"
-  >
-    <h5 className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-widest text-sm uppercase italic`}>
-      Day 2 | Sunday Brunch
-    </h5>
-    <div className="space-y-3">
-      <p className="text-sm md:text-base font-semibold uppercase tracking-tight leading-snug">
-        Sun, Sept 6 | 12PM-5PM | <span className={`text-[${goldPrimary}] block md:inline`}>Location: TBC (Maryland)</span>
-      </p>
-      <p className="text-[12px] md:text-xs text-white/80 leading-relaxed font-light">
-        Casual Vibes (TCGFI T-Shirt) | Complimentary for All Guests | A relaxed brunch to connect, 
-        unwind, and continue the Labor Day celebration.
-      </p>
-    </div>
-  </motion.div>
+  <CharacterReveal
+    text="TWIN CITY GLOBAL FRIENDS INITIATIVE PRESENTS: FAMILY & FRIENDS SOIRÉE & BRUNCH"
+    staggerDelay={0.02}
+    className={`text-[${goldPrimary}] text-[10px] md:text-sm font-bold tracking-[0.3em] uppercase leading-relaxed`}
+  />
 </motion.div>
 
-        {/* Standard Action Button - Replaced Blue with Decent Crimson/Gold */}
-        <div className="pt-6">
-          <motion.button 
-            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(240, 213, 139, 0.4)" }}
+        {/* STEP 2: RSVP Single Character Reveal */}
+        <CharacterReveal
+          text="RSVP"
+          staggerDelay={0.15}
+          className={`text-[${goldPrimary}] text-7xl sm:text-8xl md:text-[11rem] font-black tracking-widest drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]`}
+        />
+
+        {/* STEP 3: Day 1 & Day 2 Sections (Sliding in from center) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 text-center md:text-left">
+
+          {/* DAY 1 - Full Content */}
+          <motion.div variants={blockFade} className="space-y-6 md:border-r md:border-white/10 px-6">
+            <CharacterReveal
+              text="DAY 1 | LABOR DAY WKND"
+              className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-[0.2em] text-sm italic`}
+            />
+            <div className="space-y-4">
+              <p className="text-sm md:text-base font-bold uppercase tracking-widest leading-snug">
+                Sat, Sept 5 | 6PM-12AM |
+                <a
+                  href="https://www.grandoccasionslaurel.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`text-[${goldPrimary}] hover:text-white underline ml-2 transition-colors inline-block decoration-1 underline-offset-4`}
+                >
+                  Grand Occasions, Laurel
+                </a>
+              </p>
+              <p className="text-[12px] md:text-sm text-white/80 leading-relaxed font-light">
+                Attire - Gentlemen: Strictly Black Suit & Bow-tie, Ladies: Elegant Dress | $130 Single / $250 Couples
+                <br className="hidden md:block" />
+                <span className="mt-3 block italic text-white/50">
+                  (Includes: Red Carpet Event, Complimentary Childcare, Open Bar and more)
+                </span>
+              </p>
+            </div>
+          </motion.div>
+
+          {/* DAY 2 - Full Content */}
+          <motion.div variants={blockFade} className="space-y-6 px-6">
+            <CharacterReveal
+              text="DAY 2 | SUNDAY BRUNCH"
+              className={`text-[${goldPrimary}] font-bold border-b border-[${goldPrimary}]/30 inline-block pb-1 tracking-[0.2em] text-sm italic`}
+            />
+            <div className="space-y-4">
+              <p className="text-sm md:text-base font-bold uppercase tracking-widest leading-snug">
+                Sun, Sept 6 | 12PM-5PM | <span className={`text-[${goldPrimary}] block md:inline`}>Location: TBC (Maryland)</span>
+              </p>
+              <p className="text-[12px] md:text-sm text-white/80 leading-relaxed font-light">
+                Casual Vibes (TCGFI T-Shirt) | Complimentary for All Guests | A relaxed brunch to connect,
+                unwind, and continue the Labor Day celebration.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* STEP 4: Final Button Reveal */}
+        <motion.div variants={blockFade} className="pt-8">
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(240, 213, 139, 0.4)" }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/InvitationForm')}
-            className={`w-full md:w-auto bg-gradient-to-r from-[${deepRed}] to-[#a00000] text-white border border-[${goldPrimary}]/50 px-10 md:px-16 py-4 rounded-full font-bold transition-all flex items-center justify-center gap-3 mx-auto uppercase tracking-[0.2em] text-xs`}
+            className={`w-full md:w-auto bg-gradient-to-r from-[${deepRed}] to-[#a00000] text-white border border-[${goldPrimary}]/50 px-12 md:px-24 py-5 rounded-full font-bold uppercase tracking-[0.3em] text-[11px] shadow-2xl transition-all flex items-center justify-center gap-4 mx-auto`}
           >
-            RSVP & Pay <span className="text-xl md:text-2xl leading-none">→</span>
+            RSVP & Pay <span className="text-2xl leading-none">→</span>
           </motion.button>
-          <p className="text-[10px] text-white/40 uppercase tracking-widest mt-4">Standard Entry Requirements Apply</p>
-        </div>
-      </div>
+          <motion.p variants={blockFade} className="text-[10px] text-white/30 uppercase tracking-[0.5em] mt-8">
+            Standard Entry Requirements Apply
+          </motion.p>
+        </motion.div>
+
+      </motion.div>
     </div>
   );
 };

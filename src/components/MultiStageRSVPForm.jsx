@@ -182,7 +182,7 @@ const MultiStageRSVPForm = () => {
                 disabled={loading}
                 className="w-full bg-[#f0d58b] text-black py-5 rounded-full font-bold uppercase text-[11px] tracking-[0.3em] hover:shadow-[0_0_30px_rgba(240,213,139,0.4)] transition-all disabled:opacity-50 mb-6"
               >
-                {loading ? 'Processing Payment...' : 'Authorize & Register'}
+                {loading ? 'Processing Payment...' : 'Confirm & Pay'}
               </button>
 
               <button onClick={() => setStep(2)} className="text-white/40 uppercase text-[9px] tracking-widest hover:text-white transition-all">
