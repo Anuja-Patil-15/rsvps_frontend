@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import redCarpet from '../assets/redCrapet.jpg';
+import redCarpet from '../assets/redCrapet.jpg'; // Verify this spelling in your folder!
 
+// Corrected API Base URL logic
 const api = axios.create({
-  baseURL: 'https://rsvps-backend.onrender.com/api/rsvp || http://localhost:5000/api/rsvp',
+  baseURL: window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000/api/rsvp' 
+    : 'https://rsvps-backend.onrender.com/api/rsvp',
 });
 
 const MultiStageRSVPForm = () => {
@@ -12,31 +15,46 @@ const MultiStageRSVPForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    name: '', email: '', tableCompanion: '', dietary: '',
-    liquor: '', children: '', brunch: '', tshirtSize: ''
+    name: '', email: '', tableCompanion: '', dietary: 'No restrictions',
+    liquor: '', children: 'No', brunch: 'Yes', tshirtSize: ''
   });
 
-  const handleSubmit = async () => {
+  // Load Razorpay Script on Mount
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  const handlePayment = async () => {
+    if (!window.Razorpay) {
+      setError("Payment gateway is loading. Please try again in a moment.");
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     const options = {
-      key: "rzp_test_tG832kLaO0m5n2", // YOUR ACTUAL TEST KEY FROM DASHBOARD
+      key: "rzp_test_SLpbyLTNPFychl", // REPLACE THIS WITH YOUR KEY FROM DASHBOARD
       amount: 13000, // ₹130 in paise
       currency: "INR",
       name: "The Soirée",
       description: "Guest Registration Fee",
+      image: "https://your-logo-url.com/logo.png", // Optional
       handler: async function (response) {
         try {
-          // Send ALL data + Payment ID to your backend
+          // Send data to your backend after successful payment
           await api.post('/', {
             ...formData,
             paymentId: response.razorpay_payment_id,
             paymentStatus: 'success'
           });
-          setStep(4); // Only move to success if backend confirms save
+          setStep(4);
         } catch (err) {
-          setError("Payment successful, but record saving failed. Contact support with ID: " + response.razorpay_payment_id);
+          console.error(err);
+          setError(err.response?.data?.message || "Payment succeeded, but we couldn't save your details. Please contact support.");
         } finally {
           setLoading(false);
         }
@@ -46,14 +64,15 @@ const MultiStageRSVPForm = () => {
         email: formData.email
       },
       theme: { color: "#f0d58b" },
-      modal: { ondismiss: () => setLoading(false) }
+      modal: {
+        ondismiss: () => setLoading(false)
+      }
     };
 
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
 
-  // Animation variants for the "YouTube-style" font reveals
   const textVariant = {
     hidden: { opacity: 0, y: 20, letterSpacing: "0.5em" },
     visible: {
@@ -69,8 +88,8 @@ const MultiStageRSVPForm = () => {
   const pillButtonClasses = (isSelected) => `px-8 py-3 rounded-full border transition-all text-[9px] uppercase tracking-widest ${isSelected ? 'bg-[#f0d58b] text-black border-[#f0d58b] shadow-[0_0_20px_rgba(240,213,139,0.3)]' : 'border-white/20 text-white/60 hover:border-white'}`;
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 text-white relative overflow-hidden">
-      {/* Background with subtle parallax-like zoom */}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 text-white relative overflow-hidden font-sans">
+      {/* Background Layer */}
       <motion.div
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
@@ -80,8 +99,9 @@ const MultiStageRSVPForm = () => {
       />
       <div className="absolute inset-0 bg-gradient-to-tr from-black via-black/80 to-transparent z-0" />
 
+      {/* Form Container */}
       <div className="relative z-10 w-full max-w-2xl bg-black/40 backdrop-blur-3xl p-8 md:p-16 border border-white/10 rounded-[2rem] shadow-2xl">
-
+        
         {error && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6 text-[#ff4d4d] text-[10px] tracking-widest uppercase text-center border border-[#ff4d4d]/30 p-2">
             {error}
@@ -90,7 +110,7 @@ const MultiStageRSVPForm = () => {
 
         <AnimatePresence mode="wait">
           {step === 1 && (
-            <motion.div key="step1" initial="hidden" animate="visible" exit="hidden" className="text-center">
+            <motion.div key="step1" initial="hidden" animate="visible" exit={{ opacity: 0, x: -20 }} className="text-center">
               <motion.h1 variants={textVariant} className="text-4xl md:text-6xl font-serif mb-2 tracking-[0.3em] uppercase italic">
                 The Soirée
               </motion.h1>
@@ -138,24 +158,17 @@ const MultiStageRSVPForm = () => {
             </motion.div>
           )}
 
-          {/* STEP 3: PAYMENT SUMMARY & GATEWAY */}
           {step === 3 && (
-            <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              className="text-center"
-            >
+            <motion.div key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
               <h2 className="font-serif text-xl tracking-[0.2em] uppercase text-[#f0d58b] mb-8">Reservation Summary</h2>
-
+              
               <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8 text-left space-y-4 backdrop-blur-md">
                 <div className="flex justify-between text-[10px] tracking-widest uppercase border-b border-white/5 pb-2">
-                  <span className="text-white/40">Distinguished Guest</span>
+                  <span className="text-white/40">Guest</span>
                   <span>{formData.name}</span>
                 </div>
                 <div className="flex justify-between text-[10px] tracking-widest uppercase border-b border-white/5 pb-2">
-                  <span className="text-white/40">Event Access</span>
+                  <span className="text-white/40">Access</span>
                   <span>Soirée & Brunch</span>
                 </div>
                 <div className="flex justify-between text-xl font-serif pt-4">
@@ -165,44 +178,26 @@ const MultiStageRSVPForm = () => {
               </div>
 
               <button
-                onClick={handleSubmit} // This will trigger the Razorpay popup
+                onClick={handlePayment}
                 disabled={loading}
                 className="w-full bg-[#f0d58b] text-black py-5 rounded-full font-bold uppercase text-[11px] tracking-[0.3em] hover:shadow-[0_0_30px_rgba(240,213,139,0.4)] transition-all disabled:opacity-50 mb-6"
               >
-                {loading ? 'Securing Spot...' : 'Proceed to Payment'}
+                {loading ? 'Processing Payment...' : 'Authorize & Register'}
               </button>
 
               <button onClick={() => setStep(2)} className="text-white/40 uppercase text-[9px] tracking-widest hover:text-white transition-all">
-                ← Review Details
+                ← Edit Information
               </button>
             </motion.div>
           )}
 
-          {/* STEP 4: FINAL CONFIRMATION */}
           {step === 4 && (
-            <motion.div
-              key="step4"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="text-center py-10 md:py-20"
-            >
-              <motion.div
-                initial={{ rotate: -180, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                className="text-[#f0d58b] text-6xl mb-8"
-              >
-                ◈
-              </motion.div>
+            <motion.div key="step4" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-10">
+              <div className="text-[#f0d58b] text-6xl mb-8">◈</div>
               <h2 className="text-3xl font-serif tracking-[0.3em] uppercase mb-4">Confirmed</h2>
-              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-2">Your reservation is now secured.</p>
-              <p className="text-[#f0d58b] text-[10px] uppercase tracking-[0.2em] mb-12 italic font-light">Payment Received Successfully</p>
-
+              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mb-12">Your invitation is secured. We await your arrival.</p>
               <button
-                onClick={() => {
-                  setStep(1);
-                  setFormData({ name: '', email: '', tableCompanion: '', dietary: '', liquor: '', children: '', brunch: '', tshirtSize: '' });
-                }}
+                onClick={() => { setStep(1); setFormData({ name: '', email: '', tableCompanion: '', dietary: 'No restrictions', liquor: '', children: 'No', brunch: 'Yes', tshirtSize: '' }); }}
                 className="text-[#f0d58b] border border-[#f0d58b]/20 px-10 py-4 rounded-full hover:bg-[#f0d58b] hover:text-black transition-all text-[9px] tracking-[0.3em] uppercase"
               >
                 Register Another Guest
@@ -214,16 +209,21 @@ const MultiStageRSVPForm = () => {
         {step < 3 && (
           <div className="flex flex-col items-center mt-12 gap-6">
             <button
-              onClick={() => step === 1 ? (formData.name && formData.email ? setStep(2) : setError("Please state your name and email.")) : handleSubmit()}
-              disabled={loading}
-              className="w-full bg-[#f0d58b] text-black py-5 rounded-full font-bold uppercase text-[11px] tracking-[0.3em] hover:shadow-[0_0_30px_rgba(240,213,139,0.4)] transition-all disabled:opacity-50"
+              onClick={() => {
+                if (step === 1) {
+                  (formData.name && formData.email) ? setStep(2) : setError("Please provide your name and email.");
+                } else if (step === 2) {
+                  setStep(3);
+                }
+              }}
+              className="w-full bg-[#f0d58b] text-black py-5 rounded-full font-bold uppercase text-[11px] tracking-[0.3em] hover:shadow-[0_0_30px_rgba(240,213,139,0.4)] transition-all"
             >
-              {loading ? 'Submitting...' : step === 1 ? 'Proceed to Details' : 'Finalize Reservation'}
+              {step === 1 ? 'Proceed to Details' : 'Review Summary'}
             </button>
 
-            {step > 1 && (
+            {step === 2 && (
               <button onClick={() => setStep(1)} className="text-white/40 uppercase text-[9px] tracking-widest hover:text-white transition-all">
-                ← Modify Previous Details
+                ← Previous Step
               </button>
             )}
           </div>
